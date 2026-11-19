@@ -1,0 +1,27 @@
+# Maven build output
+target/
+!.gitkeep
+
+# Compiled / temp files
+*.class
+*.log
+*.tmp
+*.bak
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local run artifacts
+*.pid

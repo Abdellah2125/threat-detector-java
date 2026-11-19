@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<title>التقرير الشامل لتطبيق Threat Detector</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm 18mm 14mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.85;
+    color: #16202b;
+    margin: 0;
+  }
+  h1, h2, h3, h4 { color: #0d1b2a; margin: 0 0 10px 0; line-height: 1.35; }
+  h1 { font-size: 26pt; }
+  h2 { font-size: 16pt; border-bottom: 2px solid #c07f1c; padding-bottom: 6px; margin-top: 26px; }
+  h3 { font-size: 12.5pt; color: #8a5a12; margin-top: 18px; }
+  h4 { font-size: 11pt; }
+  p { margin: 6px 0 10px 0; text-align: justify; }
+  ul, ol { margin: 6px 0 12px 0; padding-inline-start: 22px; }
+  li { margin: 3px 0; }
+  .ltr { direction: ltr; unicode-bidi: embed; font-family: Consolas, "Courier New", monospace; font-size: 9.2pt; }
+  code { direction: ltr; unicode-bidi: embed; font-family: Consolas, "Courier New", monospace; font-size: 9pt; background: #f2f4f7; padding: 1px 4px; border-radius: 3px; color: #8a4b08; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 16px 0; font-size: 9pt; }
+  thead { display: table-header-group; }
+  th { background: #142438; color: #fff; text-align: right; padding: 7px 8px; border: 1px solid #0d1b2a; font-weight: 600; }
+  td { padding: 6px 8px; border: 1px solid #cbd3dc; vertical-align: top; }
+  tbody tr:nth-child(even) { background: #f6f8fa; }
+  tr { break-inside: avoid; }
+  .cover { text-align: center; padding: 65px 10px 35px 10px; border: 3px double #c07f1c; background: #fcfaf5; }
+  .cover h1 { font-size: 27pt; margin-bottom: 6px; }
+  .cover .sub { font-size: 14pt; color: #55606c; margin-bottom: 28px; }
+  .cover .tag { display: inline-block; background: #142438; color: #fff; padding: 5px 18px; font-size: 10pt; margin-bottom: 20px; }
+  .meta { width: 72%; margin: 0 auto 22px auto; font-size: 10pt; }
+  .meta td:first-child { width: 32%; background: #eef1f4; font-weight: 600; }
+  .note { background: #fff6e6; border-right: 4px solid #c07f1c; padding: 12px 15px; text-align: right; font-size: 9.5pt; }
+  .toc a { color: #142438; text-decoration: none; }
+  .toc li { margin: 5px 0; }
+  .box { background: #f4f6f8; border: 1px solid #cbd3dc; border-right: 4px solid #142438; padding: 10px 14px; margin: 12px 0; }
+  .warn { background: #fff4f1; border-right-color: #b4472f; }
+  .ok { background: #f1f8ef; border-right-color: #4f7a3d; }
+  .pb { page-break-before: always; }
+  .small { font-size: 8.6pt; color: #56616d; }
+  .center { text-align: center; }
+  .kpi { display: inline-block; width: 23%; text-align: center; background: #142438; color: #fff; padding: 10px 4px; margin: 4px 0; }
+  .kpi b { display: block; font-size: 17pt; color: #e8a33d; }
+  .flow { background: #0f1b2a; color: #e8edf3; padding: 13px; text-align: center; font-family: Consolas, monospace; font-size: 9pt; direction: ltr; unicode-bidi: embed; margin: 12px 0; }
+  .footer-note { margin-top: 35px; border-top: 1px solid #cbd3dc; padding-top: 8px; font-size: 8.5pt; color: #6b7480; text-align: center; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="tag">النسخة 0.1.0 — إصدار داخلي</div>
+  <h1>التقرير الشامل لتطبيق<br>Threat Detector</h1>
+  <p class="sub">إعادة كتابة مستقلة بالكامل بلغة Java وJavaFX</p>
+  <table class="meta">
+    <tr><td>اسم المشروع</td><td>threat-detector-java</td></tr>
+    <tr><td>المعرّفMaven</td><td class="ltr">com.threatdetector:threat-detector-java:0.1.0</td></tr>
+    <tr><td>الإصدار المستهدف من Java</td><td>Java 17</td></tr>
+    <tr><td>إطار الواجهة</td><td>JavaFX 17.0.10</td></tr>
+    <tr><td>نمط الكشف</td><td>قواعد محلية حتمية (Option A) — دون اتصال شبكي</td></tr>
+    <tr><td>تاريخ التقرير</td><td>19 نوفمبر 2026</td></tr>
+    <tr><td>حالة Sprint 01 الأساسية</td><td>مكتملة — 10/10</td></tr>
+  </table>
+  <div class="note">
+    هذا التقرير يوثّق البنية العامة، ومنهجية العمل، ووظيفة كل ملف في المشروع، وحدود التنفيذ الحالية، ونتائج التحقق. المشروع منفصل تماماً عن مستودع Rust/Tauri الأصلي ويُستخدم كمرجع مقارنة فقط.
+  </div>
+</section>
+
+<div class="pb"></div>
+<section id="toc">
+  <h2>المحتويات</h2>
+  <ol class="toc">
+    <li><a href="#s1">الملخص التنفيذي</a></li>
+    <li><a href="#s2">هوية المشروع وأهدافه</a></li>
+    <li><a href="#s3">البنية العامة وتدفق البيانات</a></li>
+    <li><a href="#s4">منهجية الكشف والتقييم</a></li>
+    <li><a href="#s5">استيعاب الدفعات عبر CSV</a></li>
+    <li><a href="#s6">طبقة التشغيل والتزامن</a></li>
+    <li><a href="#s7">واجهة JavaFX</a></li>
+    <li><a href="#s8">دليل الملفات ووظيفة كل ملف</a></li>
+    <li><a href="#s9">معالجة الأخطاء ودلالة Not Verified</a></li>
+    <li><a href="#s10">البناء والتشغيل</a></li>
+    <li><a href="#s11">الاختبارات ونتائج التحقق</a></li>
+    <li><a href="#s12">القيود والعمل المستقبلي</a></li>
+    <li><a href="#s13">الخاتمة وتقييم الجاهزية</a></li>
+  </ol>
+</section>
+
+<section id="s1" class="pb">
+  <h2>١. الملخص التنفيذي</h2>
+  <p>تطبيق <strong>Threat Detector</strong> هو إعادة كتابة مستقلة بالكامل بلغة JavaFX لأداة كشف تهديدات كانت مبنية أصلاً بتقنية Rust/Tauri وواجهة React. يهدف المشروع إلى الحفاظ على الهوية البصرية للواجهة القديمة مع تنسيق الألوان وتنظيم الشاشات بطريقة احترافية، وتنفيذ متطلبات Sprint 01 حرفياً: واجهة JavaFX، قواعد محلية، وتعدد خيوط حقيقي.</p>
+  <div class="center">
+    <span class="kpi"><b>17</b>قاعدة كشف</span>
+    <span class="kpi"><b>4</b>خيوط عمل</span>
+    <span class="kpi"><b>52</b>اختباراً ناجحاً</span>
+    <span class="kpi"><b>0</b>اتصال شبكي</span>
+  </div>
+  <p>يعمل التطبيق محلياً بالكامل. يُدخل المستخدم إما رابطاً أو رسالة واحدة، أو يحمّل ملف CSV للفحص الدفعي. تُقيَّم كل إشارة بمجموعة قواعد حتمية، ويُنتج عن ذلك درجة من 0 إلى 100 ومستوى خطورة <span class="ltr">LOW / MEDIUM / HIGH</span>، أو حالة مستقلة هي <span class="ltr">Not Verified</span> عند تعذّر التحقق. الواجهة لا تحسب أي درجة بنفسها، بل تستدعي طبقة تنسيق تُسمى <code>ScanCoordinator</code>.</p>
+  <div class="box ok">
+    <strong>الجاهزية:</strong> متطلبات Sprint 01 الأساسية مكتملة ومُختبرة بالكامل. الميزة الإضافية (AI explanation) مُهيكلة كواجهة قابلة للتوصيل فقط، لا تغيّر النقاط، ولذلك تُقيَّم كـ «جزئية» في مصفوفة المتطلبات.
+  </div>
+</section>
+
+<section id="s2">
+  <h2>٢. هوية المشروع وأهدافه</h2>
+  <h3>٢.١ الفصل عن المشروع الأصلي</h3>
+  <p>يوجد المشروع في المجلد <code>C:\Users\mhmdb\Desktop\threat-detector-java</code>، بينما يوجد المستودع الأصلي في <code>C:\Users\mhmdb\Desktop\threat-detector</code>. لم يتم تعديل المستودع الأصلي؛ استُخدم كمرجع بصري وتقني فقط لمقارنة الهوية البصرية وسلوك العرض.</p>
+  <h3>٢.٢ الأهداف المحققة</h3>
+  <table>
+    <thead><tr><th>الهدف</th><th>التحقيق</th></tr></thead>
+    <tbody>
+      <tr><td>واجهة JavaFX أصلية</td><td>قشرة <code>ThreatDetectorApp</code> مع لوحات وأساليب CSS مخصصة.</td></tr>
+      <tr><td>قواعد محلية حقيقية</td><td>10 قواعد للروابط + 7 قواعد للرسائل، بلا اتصال خارجي.</td></tr>
+      <tr><td>تعدد خيوط فعلي</td><td>مسبح ثابت من 4 خيوط مع « AtomicInteger cursor » ونتائج مُنسّقة حسب ترتيب الإدخال.</td></tr>
+      <tr><td>إدخال مفرد ودفعي</td><td>حقل فحص مباشر، وقارئ CSV محدود ومُتحقَّق منه.</td></tr>
+      <tr><td>هوية بصرية قديمة</td><td>ألوان داكنة، كهرمان واحدة، خطوط <span class="ltr">Chakra Petch</span> و<span class="ltr">JetBrains Mono</span>، مشهد <span class="ltr">ThreadCore</span> ثلاثي الأبعاد.</td></tr>
+      <tr><td>شرح الواجهة للمستخدم</td><td>شريط إرشادي داخل التطبيق بالأقسام A وB وC وD.</td></tr>
+    </tbody>
+  </table>
+  <h3>٢.٣ القرارات التصميمية</h3>
+  <ul>
+    <li>اختيار <strong>Option A</strong> بدل API خارجي: لا مفاتيح API، لا حدود معدل، لا اتصالات HTTP، ونتائج قابلة لإعادة الإنتاج.</li>
+    <li>استخدام <strong>JavaFX SubScene</strong> و<strong>PerspectiveCamera</strong> بدل Three.js/WebGL لمشهد العمليات ثلاثي الأبعاد.</li>
+    <li>تغليف المنطق في خمس حزم: <code>model</code>, <code>detection</code>, <code>intake</code>, <code>runtime</code>, <code>ui</code>.</li>
+    <li>اعتبار <code>Not Verified</code> حالة مستقلة لا تُحوَّل أبداً إلى <code>LOW</code>.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>٣. البنية العامة وتدفق البيانات</h2>
+  <h3>٣.١ المخطط الطبقي</h3>
+  <div class="flow">
+UI (JavaFX)  →  runtime (ScanCoordinator / ScanEngine / Services)  →  detection (RuleSet / Rules / Scoring)  →  model (Records)
+intake (CsvLoader)  →  model (LoadedRow / CsvLoadReport)  →  runtime.scanBatch
+  </div>
+  <table>
+    <thead><tr><th>الحزمة</th><th>الدور</th><th>القاعدة الذهبية</th></tr></thead>
+    <tbody>
+      <tr><td><code>model</code></td><td>سجلات بيانات غير قابلة للتعديل، أنماط، أحداث.</td><td>لا منطق كشف ولاooks واجهة.</td></tr>
+      <tr><td><code>detection</code></td><td>القواعد، الكتالوج، التحقق من المدخل، النقاط.</td><td>دوال نقية وحتمية قدر الإمكان.</td></tr>
+      <tr><td><code>intake</code></td><td>قراءة CSV وتحويله إلى صفوق مُتحقَّق منها.</td><td>لا يستدعي محرك القواعد مباشرة.</td></tr>
+      <tr><td><code>runtime</code></td><td>التنسيق، التقييم، التزامن، محاكاة الأخطاء، الشرح الاختياري.</td><td>النقطة الوحيدة التي يستدعيها-thread الواجهة.</td></tr>
+      <tr><td><code>ui</code></td><td>العرض، التفاعل، المشهد 3D، جسر الأحداث.</td><td>لا تحسب درجات وتُحدّث الواجهة عبر <code>Platform.runLater</code>.</td></tr>
+    </tbody>
+  </table>
+  <h3>٣.٢ تدفق الفحص المفرد</h3>
+  <ol>
+    <li>المستخدم يختار <span class="ltr">URL</span> أو <span class="ltr">Message</span> ويُدخل النص أو يضغط إحدى البطاقات الثلاث.</li>
+    <li><code>CheckPanel</code> يتحقق من الفراغ والطول ثم يستدعي <code>bridge.onReset()</code>.</li>
+    <li>على خيط daemon باسم <code>check-scan</code> يُستدعى <code>coordinator.scanSingle(...)</code>.</li>
+    <li><code>ScanEngine</code> يوزّع العنصر على عامل من مسبح 4 خيوط، فيستدعي <code>LocalRuleEvaluationService</code>.</li>
+    <li><code>RuleSet</code> يُحلّل المدخل ويُشغّل القواعد، ثم <code>Scoring.finalize</code> يُنتج الدرجة والمستوى.</li>
+    <li><code>ScanUiBridge</code> يبث الأحداث إلى الواجهة، فتُحدَّث المؤشرات والمشهد ثلاثي الأبعاد وبطاقة الحكم.</li>
+  </ol>
+  <h3>٣.٣ تدفق الفحص الدفعي</h3>
+  <p>يُختار الملف من <span class="ltr">Bulk scan → Choose file</span>، فيقرأه <code>CsvLoader</code> وُنتج <code>CsvLoadReport</code> يحوي صفوفاً صالحة وأخرى تحمل مسبقاً <code>NotVerified / INVALID_CSV_ROW</code>. ثم يمرّ التقرير إلى <code>ScanCoordinator.scanBatch</code> الذي يحوّل الصفوف إلى عناصر عمل، ويغلّف المُقيِّم بحيث تُعاد النتيجة المسبقة للصفوف غير الصالحة دون تقييمها مجدداً.</p>
+</section>
+
+<section id="s4" class="pb">
+  <h2>٤. منهجية الكشف والتقييم</h2>
+  <h3>٤.١ الفرق بين الخيار الأول والثاني</h3>
+  <table>
+    <thead><tr><th>وجه المقارنة</th><th>Option A — المستخدم فعلياً</th><th>Option B — مُモデルَج فقط</th></tr></thead>
+    <tbody>
+      <tr><td>الصنف</td><td><code>LocalRuleEvaluationService</code></td><td><code>ExternalApiEvaluationService</code></td></tr>
+      <tr><td>المصدر</td><td>قواعد Java محلية عبر <code>RuleSet</code>.</td><td>خدمة خارجية مفترضة بلا طلب HTTP حقيقي.</td></tr>
+      <tr><td>المخرج</td><td><code>Scored(score, risk, findings)</code> أو <code>NotVerified</code> لأسباب الإدخال.</td><td>يرمي <code>CheckUnavailableException</code> في كل الأوضاع، فيُحوَّل إلى <code>NotVerified</code>.</td></tr>
+      <tr><td>الشبكة والمفتاح</td><td>لا شيء إطلاقاً.</td><td>يحاكي <code>API_KEY_MISSING</code> و<code>API_RATE_LIMITED</code> و<code>API_TIMEOUT</code> و<code>API_INVALID_RESPONSE</code>.</td></tr>
+      <tr><td>الحالة في البناء</td><td>مُفعّل افتراضياً في <code>ScanCoordinator</code>.</td><td>موجود لإثبات معالجة الأخطاء فقط.</td></tr>
+    </tbody>
+  </table>
+  <div class="note">حتى وضع <code>AVAILABLE</code> في الخيار الثاني يرمي <code>CHECK_UNAVAILABLE</code>، لأن البناء صُمِّم offline. بهذا لا يُفترض أن «غياب التحقق = أمان».</div>
+
+  <h3>٤.٢ قواعد الروابط العشر</h3>
+  <table>
+    <thead><tr><th>معرّف القاعدة</th><th>الإشارة</th><th>النقاط</th></tr></thead>
+    <tbody>
+      <tr><td class="ltr">url.no_https</td><td>المخطط http بدل https</td><td>20</td></tr>
+      <tr><td class="ltr">url.ip_host</td><td>المضيف عنوان IP (IPv4 أو IPv6)</td><td>25</td></tr>
+      <tr><td class="ltr">url.userinfo</td><td>بيانات دخول مدمجة في الرابط</td><td>15</td></tr>
+      <tr><td class="ltr">url.punycode</td><td>استخدام <code>xn--</code> لتزييف العلامة</td><td>15</td></tr>
+      <tr><td class="ltr">url.many_subdomains</td><td>4 مستويات نطاق فرعي فأكثر</td><td>10</td></tr>
+      <tr><td class="ltr">url.suspicious_tld</td><td>نطاق ذو TLD مشبوه مثل tk وgq وxyz وclick...</td><td>15</td></tr>
+      <tr><td class="ltr">url.shortener</td><td>مختصر روابط معروف مثل bit.ly</td><td>10</td></tr>
+      <tr><td class="ltr">url.nonstandard_port</td><td>منفذ غير 80 أو 443</td><td>10</td></tr>
+      <tr><td class="ltr">url.long_url</td><td>أطول من 120 حرفاً</td><td>10</td></tr>
+      <tr><td class="ltr">url.bait_keywords</td><td>كلمات مثل login وverify وwallet وprize</td><td>10</td></tr>
+    </tbody>
+  </table>
+  <p class="small">قائمة TLD الفعلية: <span class="ltr">zip, mov, xyz, top, tk, gq, cf, click</span>. المختصرات: <span class="ltr">bit.ly, tinyurl.com, t.co, goo.gl, ow.ly, is.gd, buff.ly, cutt.ly, rb.gy</span>.</p>
+
+  <h3>٤.٣ قواعد الرسائل السبع</h3>
+  <table>
+    <thead><tr><th>معرّف القاعدة</th><th>الإشارة</th><th>النقاط</th></tr></thead>
+    <tbody>
+      <tr><td class="ltr">msg.urgency</td><td>عبارات استعجال مثل urgent وact now وwithin 24 hours</td><td>20</td></tr>
+      <tr><td class="ltr">msg.credential_request</td><td>طلب فعل + سر (password/otp/cvv)، مع استثناء رمز التحقق العادي</td><td>30</td></tr>
+      <tr><td class="ltr">msg.financial_bait</td><td>جائزة أو عملة رقمية أو استرداد أو هدية</td><td>20</td></tr>
+      <tr><td class="ltr">msg.threat_pressure</td><td>تهديد بإيقاف أو إجراء قانوني أو فقدان وصول</td><td>20</td></tr>
+      <tr><td class="ltr">msg.shortened_link</td><td>وجود مختصر روابط داخل النص</td><td>15</td></tr>
+      <tr><td class="ltr">msg.callback_request</td><td>طلب تواصل عبر واتساب/تليجرام أو رقم هاتف</td><td>10</td></tr>
+      <tr><td class="ltr">msg.all_caps</td><td>أكثر من 20 حرفاً وأغلبها أحرف كبيرة</td><td>5</td></tr>
+    </tbody>
+  </table>
+
+  <h3>٤.٤ نظام النقاط والمستويات</h3>
+  <div class="flow">مجموع نقاط القواعد المُشترِطة → قصّ عند 100 واقتطاع سالب إلى 0 → التصنيف</div>
+  <table>
+    <thead><tr><th>الدرجة</th><th>المستوى</th><th>الدلالة في الواجهة</th></tr></thead>
+    <tbody>
+      <tr><td>60 – 100</td><td><span class="ltr">HIGH</span></td><td>إشارات عدائية واضحة — «Hostile signals».</td></tr>
+      <tr><td>25 – 59</td><td><span class="ltr">MEDIUM</span></td><td>يستوجب المراجعة — «Review before trusting».</td></tr>
+      <tr><td>0 – 24</td><td><span class="ltr">LOW</span></td><td>لا قواعد مهمة — <strong>ليس ضمان أمان</strong>.</td></tr>
+      <tr><td>غير محسوبة</td><td><span class="ltr">NOT VERIFIED</span></td><td>تعذّر التحقق — حالة مستقلة وليست منخفضة.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s5">
+  <h2>٥. استيعاب الدفعات عبر CSV</h2>
+  <p>يُقرأ الملف بترميز UTF-8، ويُقبل الرأس <code>type,target</code> Ignoring للحالة، مع دعم BOM والفاصلة داخل الخلايا المقتبسة وعلامة الاقتباس المهرّبة <code>""</code>. الأنواع المقبولة هما <code>url</code> و<code>message</code> فقط.</p>
+  <table>
+    <thead><tr><th>الحد</th><th>القيمة</th><th>السلوك عند التجاوز</th></tr></thead>
+    <tbody>
+      <tr><td>حجم الملف</td><td>5 ميغابايت</td><td><code>LoadException</code> ويُعرض شريط خطأ.</td></tr>
+      <tr><td>صفوف البيانات</td><td>5000 صف</td><td><code>LoadException</code>.</td></tr>
+      <tr><td>التحذيرات المعروضة</td><td>12 تحذيراً كحد أقصى</td><td>تُقطع البقية في القائمة الداخلية.</td></tr>
+      <tr><td>نوع غير مدعوم أوtarget فارغ</td><td>صف غير صالح</td><td>يبقى في التقرير كـ <code>INVALID_CSV_ROW</code>.</td></tr>
+      <tr><td>رأس خاطئ أو لا صفوف بيانات</td><td>ملف مرفوض</td><td><code>LoadException</code>.</td></tr>
+    </tbody>
+  </table>
+  <p>العيّنة الجاهزة <code>samples/inputs.csv</code> تحوي 10 صفوف: 8 صالحة CSV و2 غير صالحين، وتُستخدم لاختبار بقاء الصفوف غير الصالحة دون تقييم.</p>
+</section>
+
+<section id="s6" class="pb">
+  <h2>٦. طبقة التشغيل والتزامن</h2>
+  <h3>٦.١ مسبح الخيوط</h3>
+  <ul>
+    <li>عدد العمال الافتراضي: <code>DEFAULT_WORKERS = 4</code>.</li>
+    <li>العدد الفعلي: <code>min(maxWorkers, max(1, total))</code>، وصفر عناصر يعني صفر عامل.</li>
+    <li><code>AtomicInteger cursor</code> يضمن أخذ كل عنصر بواسطة عامل واحد بالضبط.</li>
+    <li>مصفوفة <code>ItemResult[]</code> تُحفظ فيها النتائج بمؤشرها الأصلي، فتبقى قائمة النتائج مرتبة رغم التزامن.</li>
+    <li>يُنتظر انتهاء المهام عبر <code>Future.get()</code>، ثم <code>shutdown()</code> و<code>awaitTermination(5s)</code> وإلا <code>shutdownNow()</code>.</li>
+  </ul>
+  <h3>٦.٢ الأحداث والقياس الحيّ</h3>
+  <p>يعرّف <code>ScanEvents</code> ثلاثة سجلات: <code>ScanStartedEvent</code>، <code>ScanItemEvent</code>، و<code>ScanFinishedEvent</code>. يستقبل <code>ScanObserver</code> هذه الأحداث، وتنفّذ الواجهة <code>ScanUiBridge</code> لترجمتها إلى تحديثات واجهة عبر <code>Platform.runLater</code>. زمن كل عنصر يُقاس بـ <code>nanoTime</code> ويُقصّ إلى 1ms على الأقل حتى يظهر بوضوح في العرض.</p>
+  <h3>٦.٣ عزل الأخطاء</h3>
+  <table>
+    <thead><tr><th>الحالة</th><th>المعالجة</th></tr></thead>
+    <tbody>
+      <tr><td><code>CheckUnavailableException</code></td><td>تُحوَّل إلى <code>NotVerified(code, message)</code>.</td></tr>
+      <tr><td>أي <code>Throwable</code> آخر داخل عامل</td><td>يُعزل كـ <code>NotVerified / RULE_EXCEPTION</code> ولا يُسقط الدفعة.</td></tr>
+      <tr><td>صف CSV غير صالح</td><td>يُعاد مباشرة دون استدعاء القواعد.</td></tr>
+      <tr><td>AI غير متاح</td><td>يُعيد <code>Optional.empty()</code> ولا يغيّر الدرجة.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s7">
+  <h2>٧. واجهة JavaFX</h2>
+  <h3>٧.١ الهيكل العام</h3>
+  <p>القشرة <code>BorderPane</code> بصنف <code>app-shell</code>: الشريط الأيسر <code>Rail</code> بعرض 268px، والوسط <code>ScrollPane.main-scroll</code> يحوي <code>VBox.main-content</code> بحد أقصى 1460px. الترتيب الداخلي: الشريط العلوي، <code>Hero</code>، الشريط الإرشادي، مساحة العمل، قسم النتائج، ثم التذييل.</p>
+  <p>أبعاد النافذة من <code>Screen.getPrimary().getVisualBounds()</code>: العرض بين 1024 و1440، والارتفاع بين 640 و900، مع توسيط النافذة وحد أدنى 1024×640. العنوان: <span class="ltr">Threat Detector — Signal Intelligence</span>.</p>
+  <h3>٧.٢ الشريط الإرشادي داخل التطبيق</h3>
+  <table>
+    <thead><tr><th>المفتاح</th><th>النص</th><th>المعنى</th></tr></thead>
+    <tbody>
+      <tr><td>A · NAVIGATION</td><td>Switch workspaces and read live scan status.</td><td>التنقل بين المساحات وقراءة الحالة الحية.</td></tr>
+      <tr><td>B · INPUT</td><td>Enter one signal or load a CSV batch for local rules.</td><td>إدخال إشارة أو تحميل دفعة CSV.</td></tr>
+      <tr><td>C · LIVE FLOOR</td><td>Watch items travel from ingress through workers to the archive.</td><td>مراقبة مسار العناصر من الاستقبال إلى الأرشفة.</td></tr>
+      <tr><td>D · REPORT</td><td>Read the verdict, score, findings and per-item evidence.</td><td>قراءة الحكم والدرجة والدليل.</td></tr>
+    </tbody>
+  </table>
+  <h3>٧.٣ مساحات العمل الثلاث</h3>
+  <table>
+    <thead><tr><th>المساحة</th><th>اللوحة</th><th>الوظيفة</th></tr></thead>
+    <tbody>
+      <tr><td>01 Check</td><td><code>CheckPanel</code></td><td>فحص رابط أو رسالة واحدة، مع 3 بطاقات عيّنة قابلة للنقر.</td></tr>
+      <tr><td>02 Bulk scan</td><td><code>BulkPanel</code></td><td>اختيار CSV، معاينة أول 6 صفوف، وتشغيل دفعة على خيط daemon.</td></tr>
+      <tr><td>03 How it works</td><td><code>MethodPanel</code></td><td>سلم الدرجات، عقد التزامن، جداول القواعد، والحدود التشغيلية.</td></tr>
+    </tbody>
+  </table>
+  <h3>٧.٤ المشهد ثلاثي الأبعاد <span class="ltr">ThreadCore</span></h3>
+  <p>يبني المشهد <code>SubScene</code> بحجم 400×430 بكاميرا منظورية وزاوية رؤية 30. الأرضية 11.8×6.8 بوحدة استقبال على اليسار، وأربعة أبراج عاملين في المنتصف، ومنصة أرشفة بـ12 خانة على اليمين. الكابلات أنابيب ووصلات كروية، والحزم كرات تُلوَّن حسب النتيجة: أحمر للعالي، برتقالي للمتوسط، أخضر للمنخفض، ورمادي لغير المحسوب. خط مسح متحرك وشريط تقدم يعكسان نشاط الفحص.</p>
+  <div class="box">
+    <strong>الكاميرا الحالية:</strong> نظرة علوية مباشرة (top-down). الهدف <code>(0.15, 0.62, 0.35)</code> والعين <code>(target.x, 24, target.z + 0.01)</code>. الإزاحة الصغيرة جداً في محور z تمنع انحناء دالة <code>lookAt</code> عند النظرة الرأسية، مع الحفاظ على استقامة اللوحة بلا ميلان.
+  </div>
+  <h3>٧.٥ بطاقات العيّنات الثلاث</h3>
+  <p>في <code>CheckPanel</code> توجد ثلاث رقائق لكل نمط. عند النقر تُدخل القيمة مباشرة في حقل الإدخال. روابط العيّنة هي:</p>
+  <table>
+    <thead><tr><th>البطاقة</th><th>القيمة المُدخَلة</th></tr></thead>
+    <tbody>
+      <tr><td>Phishing URL</td><td class="ltr">http://192.168.10.24:8080/paypal/login-verify</td></tr>
+      <tr><td>Nested domain</td><td class="ltr">https://accounts.google.com.verify-login.tk/session</td></tr>
+      <tr><td>Clean URL</td><td class="ltr">https://github.com/tauri-apps/tauri</td></tr>
+    </tbody>
+  </table>
+  <p class="small">تم إصلاح مشكلة ظهورها بيضاء عبر تفكيك اسم الصنف <code>"chip chip-button"</code> إلى صنفين في <code>Ui.button</code>، وإضافة خلفية داكنة صريحة <code>#121519</code> وحدود <code>#30343a</code> ونص <code>#d2cfc6</code> في <code>app.css</code>.</p>
+  <h3>٧.٦ لوحة الألوان والخطوط</h3>
+  <table>
+    <thead><tr><th>العنصر</th><th>القيمة</th><th>الاستخدام</th></tr></thead>
+    <tbody>
+      <tr><td>الخلفية الأساسية</td><td class="ltr">#0b0d10 / #090b0e / #07080a</td><td>القشرة، الشريط، الحقول والبطاقات.</td></tr>
+      <tr><td>الأسطح</td><td class="ltr">#0e1013 / #121519 / #181c21</td><td>اللوحات، التحويم، مسار التقدم.</td></tr>
+      <tr><td>النص</td><td class="ltr">#f0eee8 / #d2cfc6 / #a09d95</td><td>عناوين، نصوص mono، ثانوي.</td></tr>
+      <tr><td>اللون المميز</td><td class="ltr">#e8a33d</td><td>كهرمان واحد للأزرار والتركيز والأقواس.</td></tr>
+      <tr><td>الخطوط</td><td>Chakra Petch + JetBrains Mono</td><td>مضمّنة عبر <code>Font.loadFont</code> و<code>@font-face</code>.</td></tr>
+    </tbody>
+  </table>
+  <p class="small">ملف <code>orbitron.ttf</code> وترخيصه موجودان في المشروع لكنهما غير مستخدمين حالياً. باقي الخطوط موزّعة تحت ترخيص SIL OFL 1.1.</p>
+</section>
+
+<section id="s8" class="pb">
+  <h2>٨. دليل الملفات ووظيفة كل ملف</h2>
+
+  <h3>٨.١ الجذور والوثائق</h3>
+  <table>
+    <thead><tr><th>الملف</th><th>الوظيفة</th><th>تفاصيل مهمة</th></tr></thead>
+    <tbody>
+      <tr><td><code>pom.xml</code></td><td>تعريف البناء والتشغيل.</td><td>Java 17، JavaFX 17.0.10، JUnit 5.10.2، إضافات compiler/surefire/shade، ملفات تعريف platform-win/mac/linux، وإنتاج fat-jar بالـ <code>Main-Class: com.threatdetector.Launcher</code>.</td></tr>
+      <tr><td><code>README.md</code></td><td>الوصف الرئيسي وطريقة البناء.</td><td>يؤكد الانفصال عن مستودع Rust، الأوامر، البنية، اختيار Option A، وعدم إرسال بيانات خارج الجهاز.</td></tr>
+      <tr><td><code>docs/SPRINT1_MAPPING.md</code></td><td>مصفوفة مطابقة المتطلبات.</td><td>11 صفاً: 10 مكتملة وواحدة جزئية للـ AI. يوثّق 52 اختباراً وحدود CSV وأكواد الأخطاء.</td></tr>
+      <tr><td><code>samples/inputs.csv</code></td><td>عيّنة جاهزة للفحص الدفعي.</td><td>10 صفوف: 8 صالحة و2 غير صالحين، تتضمن روابط IP وpunycode ومختصراً ورابطاً غير صالح.</td></tr>
+      <tr><td><code>report.html</code></td><td>مصدر هذا التقرير.</td><td>صفحة HTML عربية تُطبع إلى PDF عبر Edge headless.</td></tr>
+      <tr><td><code>threat-detector-report-ar.pdf</code></td><td>نسخة التقرير النهائية.</td><td>ملف الإخراج المطلوب.</td></tr>
+      <tr><td><code>preview.png</code></td><td>لقطة شاشة للتطبيق.</td><td>تُستخدم لمعاينة الحالة البصرية الحالية بعد التعديلات.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>٨.٢ نقطة الدخول — <code>Launcher.java</code></h3>
+  <table>
+    <thead><tr><th>الملف</th><th>الوظيفة</th><th>تفاصيل مهمة</th></tr></thead>
+    <tbody>
+      <tr><td><code>com/threatdetector/Launcher.java</code></td><td>نقطة دخول الـ fat-jar.</td><td>صنف عادي يستدعي <code>Application.launch(ThreatDetectorApp.class, args)</code>؛ تجنّب إقلاع صنف <code>Application</code> مباشرة لأن وحدات JavaFX ليست على module path.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>٨.٣ حزمة <code>model</code> — السجلات والأنماط</h3>
+  <table>
+    <thead><tr><th>الملف</th><th>الوظيفة</th><th>تفاصيل مهمة</th></tr></thead>
+    <tbody>
+      <tr><td><code>ScanItem.java</code></td><td>وحدة عمل مُرقّمة.</td><td><code>(index, rowNumber, kind, target)</code>؛ <code>rowNumber</code> اختياري للمفرد.</td></tr>
+      <tr><td><code>ScanInput.java</code></td><td>وصف إدخال خفيف.</td><td><code>(kind, target, rowNumber)</code> قبل تحويله إلى <code>ScanItem</code>.</td></tr>
+      <tr><td><code>TargetKind.java</code></td><td>نوع الهدف.</td><td><code>URL</code> أو <code>MESSAGE</code>.</td></tr>
+      <tr><td><code>RiskLevel.java</code></td><td>مستويات الخطورة.</td><td><code>LOW / MEDIUM / HIGH</code>؛ الدرجة المنخفضة ليست ضمان أمان.</td></tr>
+      <tr><td><code>Finding.java</code></td><td>قاعدة اشتركت مع دليلها.</td><td><code>(ruleId, title, points, evidence)</code> مع نسخ غير قابل للتعديل للقائمة.</td></tr>
+      <tr><td><code>ScanOutcome.java</code></td><td>نتيجة عنصر واحد.</td><td><code>sealed interface</code> بفرعين <code>Scored</code> و<code>NotVerified</code>؛ الفرع الأخير لا يُحوَّل إلى LOW.</td></tr>
+      <tr><td><code>ItemResult.java</code></td><td>نتيجة مع معرّف العامل.</td><td>يضيف <code>durationMs</code> و<code>workerId</code> إلى <code>ScanOutcome</code>.</td></tr>
+      <tr><td><code>Summary.java</code></td><td>عدّادات مجمّعة.</td><td><code>total, scored, high, medium, low, notVerified</code> ودالة <code>summarize</code>.</td></tr>
+      <tr><td><code>ScanReport.java</code></td><td>التقرير النهائي.</td><td><code>(scanId, results, summary, workersUsed, durationMs)</code>؛ النتائج مُنسوخة.</td></tr>
+      <tr><td><code>LoadedRow.java</code></td><td>صف CSV بعد التحقق.</td><td>يحمل مسبقاً <code>NotVerified / INVALID_CSV_ROW</code> للصفوف غير الصالحة.</td></tr>
+      <tr><td><code>CsvLoadReport.java</code></td><td>نتيجة قراءة الدفعة.</td><td><code>(fileName, rows, validCount, invalidCount, warnings)</code>.</td></tr>
+      <tr><td><code>ScanEvents.java</code></td><td>أحداث القياس الحيّ.</td><td>ثلاثة سجلات: started / item / finished.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>٨.٤ حزمة <code>detection</code> — القواعد والنقاط</h3>
+  <table>
+    <thead><tr><th>الملف</th><th>الوظيفة</th><th>تفاصيل مهمة</th></tr></thead>
+    <tbody>
+      <tr><td><code>Rule.java</code></td><td>واجهة قاعدة واحدة.</td><td><code>@FunctionalInterface</code> بإرجاع <code>Optional&lt;RuleHit&gt;</code>.</td></tr>
+      <tr><td><code>RuleInput.java</code></td><td>مدخلات القواعد.</td><td><code>sealed interface</code> بفرعي <code>Url(raw, uri)</code> و<code>Message(text)</code>.</td></tr>
+      <tr><td><code>RuleHit.java</code></td><td>مطابقة خام.</td><td><code>(ruleId, title, points, evidence)</code> قبل تحويله إلى <code>Finding</code>.</td></tr>
+      <tr><td><code>RuleCatalog.java</code></td><td>كتالوج شاشة «How it works».</td><td><code>RuleSpec</code> و10 قواعد URL و7 قواعد رسائل و<code>totalRules() = 17</code>.</td></tr>
+      <tr><td><code>UrlRules.java</code></td><td>تنفيذ قواعد الروابط العشر.</td><td>يفحص المخطط، IP، userinfo، punycode، subdomains، TLD، المختصرات، المنفذ، الطول، وكلمات الإغراء.</td></tr>
+      <tr><td><code>MessageRules.java</code></td><td>تنفيذ قواعد الرسائل السبع.</td><td>الاستعجال، طلب البيانات، الإغراء المالي، الضغط，المختصرات، طلب المعاودة، والحروف الكبيرة.</td></tr>
+      <tr><td><code>RuleSet.java</code></td><td>التحقق من المدخل وتشغيل القواعد.</td><td>حدود 2048 للرابط و5000 للرسالة، إضافة <code>https://</code> عند غياب المخطط، قبول http/https فقط، ثم تجميع النقاط.</td></tr>
+      <tr><td><code>Scoring.java</code></td><td>تحويل النقاط إلى خطورة.</td><td>ثوابت 60 و25 و100، ودالة نقية <code>finalize</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>٨.٥ حزمة <code>intake</code> — قراءة CSV</h3>
+  <table>
+    <thead><tr><th>الملف</th><th>الوظيفة</th><th>تفاصيل مهمة</th></tr></thead>
+    <tbody>
+      <tr><td><code>CsvLoader.java</code></td><td>قراءة وتحقق CSV.</td><td>5MB / 5000 صف / 12 تحذيراً، رأس <code>type,target</code>، محلل اقتباسات بسيط، UTF-8 مع BOM.</td></tr>
+      <tr><td><code>LoadException.java</code></td><td>استثناء فتح أو قراءة الملف.</td><td>يحمل رسالة وسبباً اختيارياً؛ يُستخدم للملف المفقود والحجم والترميز والرأس.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>٨.٦ حزمة <code>runtime</code> — التنسيق والخدمات</h3>
+  <table>
+    <thead><tr><th>الملف</th><th>الوظيفة</th><th>تفاصيل مهمة</th></tr></thead>
+    <tbody>
+      <tr><td><code>ThreatEvaluationService.java</code></td><td>منفذ تقييم مجرّد.</td><td><code>@FunctionalInterface</code> يفصل الواجهة عن محرك القواعد.</td></tr>
+      <tr><td><code>LocalRuleEvaluationService.java</code></td><td>Option A.</td><td>يغلّف <code>RuleSet</code> ويُعيد نتيجته مباشرة دون شبكة.</td></tr>
+      <tr><td><code>ExternalApiEvaluationService.java</code></td><td>Option B.</td><td>خمسة أوضاع، بلا HTTP حقيقي، وكلها ترمي <code>CheckUnavailableException</code>.</td></tr>
+      <tr><td><code>CheckUnavailableException.java</code></td><td>استثناء تعذّر الفحص.</td><td>يحمل <code>code</code> إضافياً يُستخدم في <code>NotVerified</code>.</td></tr>
+      <tr><td><code>ScanObserver.java</code></td><td>بالوع أحداث للواجهة.</td><td>دوال افتراضية started/item/finished/error و<code>NO_OP</code>.</td></tr>
+      <tr><td><code>ScanEngine.java</code></td><td>المحرك متعدد الخيوط.</td><td>مسبح 4، <code>AtomicInteger</code>، نتائج مرتبة، قياس زمن، عزل أخطاء، وإغلاق منضبط.</td></tr>
+      <tr><td><code>ScanCoordinator.java</code></td><td>خدمة التطبيق الموحّدة.</td><td>يملك <code>CsvLoader</code> و<code>ScanEngine</code> و<code>LocalRuleEvaluationService</code> و<code>AiExplanationService</code>، ويدير معرّفات الفحص.</td></tr>
+      <tr><td><code>AiExplanationService.java</code></td><td>شرح اختياري.</td><td>يُعيد <code>Optional.empty()</code> عند غياب التمن أو <code>NotVerified</code>، ولا يغيّر الدرجة.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>٨.٧ حزمة <code>ui</code> — ملفات الواجهة</h3>
+  <table>
+    <thead><tr><th>الملف</th><th>الوظيفة</th><th>تفاصيل مهمة</th></tr></thead>
+    <tbody>
+      <tr><td><code>ThreatDetectorApp.java</code></td><td>القشرة الرئيسية.</td><td>يبني BorderPane، الشريط العلوي، Hero، الشريط الإرشادي A–D، تبديل الأوضاع، إعداد النافذة، والجسر.</td></tr>
+      <tr><td><code>ThreadCoreView.java</code></td><td>المشهد ثلاثي الأبعاد.</td><td>SubScene، أرضية، أبراج العمال، كابلات، حزم، خط مسح، كاميرا علوية مباشرة.</td></tr>
+      <tr><td><code>ThreadCorePanel.java</code></td><td>بطاقة المشهد.</td><td>رأس، HUD، 4 إحصاءات، شريط تقدم، شرائح العمال، وشارة الطور (READY / CHECKING / DONE / STOPPED).</td></tr>
+      <tr><td><code>CheckPanel.java</code></td><td>مساحة الإدخال المفرد.</td><td>مفتاح URL/Message، حقل، 3 بطاقات عيّنة، Coverage، شريط خطأ، وتشغيل على خيط daemon.</td></tr>
+      <tr><td><code>BulkPanel.java</code></td><td>مساحة CSV.</td><td>Choose file، سحب/اختيار، تحذيرات، معاينة 6 صفوف، زر Run batch.</td></tr>
+      <tr><td><code>MethodPanel.java</code></td><td>مساحة الشرح.</td><td>سلم الدرجات، عقد التزامن، جدولاي القواعد، الحدود، وقراءة الحكم.</td></tr>
+      <tr><td><code>ResultsSection.java</code></td><td>قسم التقرير.</td><td>تبديل بين بطاقة مفردة وتقرير دفعة مع مرشحات وتوزيع وجدول.</td></tr>
+      <tr><td><code>VerdictCard.java</code></td><td>بطاقة حكم مفردة.</td><td>القرص، الحالة، الحقائق، صفوف النتائج والأدلة، والشرح الاختياري.</td></tr>
+      <tr><td><code>ScoreDial.java</code></td><td>مقياس دائري على Canvas.</td><td>قوس score/100، الرقم، والتسمية، مع UNSCORED عند غياب الدرجة.</td></tr>
+      <tr><td><code>ScanProgress.java</code></td><td>مؤشر تقدم مضغوط.</td><td>دوال start/item/finish/reset داخل <code>Platform.runLater</code>.</td></tr>
+      <tr><td><code>Rail.java</code></td><td>الشريط الأيسر.</td><td>العلامة، التنقل الثلاثي، الحالة الحية، حقائق المحرك، والتذييل التحذيري.</td></tr>
+      <tr><td><code>Hero.java</code></td><td>العنوان العلوي.</td><td>عنوان من سطرين، فقرة 4 خيوط/17 قاعدة، خط أنابيب 01→04، و3 مقاييس.</td></tr>
+      <tr><td><code>Panel.java</code></td><td>بطاقة مساحة عمل مشتركة.</td><td>رأس مرقّم، زوايا مشطوفة، و<code>body()</code> للمحتوى.</td></tr>
+      <tr><td><code>ChamferPane.java</code></td><td>حاوية بأقواس زخرفية.</td><td>4 خطوط L بألوان كهرمان وأحمر، تُعاد رسمها في <code>layoutChildren</code>.</td></tr>
+      <tr><td><code>Mode.java</code></td><td>تعداد الأوضاع.</td><td><code>INSPECT / BATCH / METHOD</code>.</td></tr>
+      <tr><td><code>Ui.java</code></td><td>مصانع عناصر مساعدة.</td><td><code>label/micro/mono/badge/button/spacer</code>؛ تُفكّك أسماء الأصناف بالماسافات.</td></tr>
+      <tr><td><code>BrandMark.java</code></td><td>الشعار الهندسي.</td><td>سداسيان، هالة، ونواة بلون مرجاني على مساحة 46×46.</td></tr>
+      <tr><td><code>ScanUiBridge.java</code></td><td>واجهة فصل الواجهة عن التطبيق.</td><td>onStarted/onItem/onFinished/onFailed/onReset.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>٨.٨ الموارد والاختبارات</h3>
+  <table>
+    <thead><tr><th>الملف</th><th>الوظيفة</th><th>تفاصيل مهمة</th></tr></thead>
+    <tbody>
+      <tr><td><code>app.css</code></td><td>الهوية البصرية.</td><td>تحميل الخطوط، إعادة ضبط خلفيات JavaFX، تنسيق كل الأقسام، وإصلاح خلفية <code>.chip-button</code>.</td></tr>
+      <tr><td><code>fonts/chakra-petch-*.ttf</code></td><td>أربعة أوزان للخط الأساسي.</td><td>400 و500 و600 و700، ترخيص OFL 1.1.</td></tr>
+      <tr><td><code>fonts/jetbrains-mono.ttf</code></td><td>خط الشيفرة والأرقام.</td><td>ترخيص OFL 1.1.</td></tr>
+      <tr><td><code>fonts/orbitron.ttf</code></td><td>خط مضمّن غير مستخدم.</td><td>موجود مع ترخيصه لكنه غير مُحمّل في الكود.</td></tr>
+      <tr><td><code>RuleSetTest.java</code></td><td>24 اختباراً للقواعد.</td><td>يغطي كل قاعدة، الحدود، التحويل إلى https، وأمثلة حسابية.</td></tr>
+      <tr><td><code>CsvLoaderTest.java</code></td><td>8 اختبارات للقارئ.</td><td>ملف مفقود، رأس خاطئ، صفوف غير صالحة، اقتباسات، CSV فارغ.</td></tr>
+      <tr><td><code>ScanEngineTest.java</code></td><td>8 اختبارات للمحرك.</td><td>ترتيب النتائج، معرّفات العمال، عزل الأخطاء، تدفق الأحداث، وإثبات التزامن.</td></tr>
+      <tr><td><code>ScoringTest.java</code></td><td>5 اختبارات للنقاط.</td><td>القصّ عند 100، العتبات 60 و25، والاقتطاع إلى 0.</td></tr>
+      <tr><td><code>ServiceTest.java</code></td><td>7 اختبارات للخدمات.</td><td>Option A/B، AI، وبقاء صف CSV غير الصالح.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9" class="pb">
+  <h2>٩. معالجة الأخطاء ودلالة Not Verified</h2>
+  <table>
+    <thead><tr><th>الكود</th><th>المصدر</th><th>المعنى</th></tr></thead>
+    <tbody>
+      <tr><td class="ltr">EMPTY_INPUT</td><td>RuleSet</td><td>مدخل فارغ بعد القصّ.</td></tr>
+      <tr><td class="ltr">INVALID_URL</td><td>RuleSet</td><td>مخطط غير مدعوم، أو لا مضيف، أو Uri غير قابل للتحليل.</td></tr>
+      <tr><td class="ltr">INPUT_TOO_LONG</td><td>RuleSet</td><td>تجاوز 2048 للرابط أو 5000 للرسالة.</td></tr>
+      <tr><td class="ltr">INVALID_CSV_ROW</td><td>CsvLoader</td><td>نوع غير مدعوم أو خلية target فارغة.</td></tr>
+      <tr><td class="ltr">LoadException</td><td>CsvLoader</td><td>ملف مفقود، حجم/ترميز/رأس غير مقبول، أو لا صفوف بيانات.</td></tr>
+      <tr><td class="ltr">API_KEY_MISSING</td><td>ExternalApiEvaluationService</td><td>محاكاة فقدان مفتاح API.</td></tr>
+      <tr><td class="ltr">API_RATE_LIMITED</td><td>ExternalApiEvaluationService</td><td>محاكاة HTTP 429.</td></tr>
+      <tr><td class="ltr">API_TIMEOUT</td><td>ExternalApiEvaluationService</td><td>محاكاة انتهاء المهلة.</td></tr>
+      <tr><td class="ltr">API_INVALID_RESPONSE</td><td>ExternalApiEvaluationService</td><td>محاكاة استجابة غير صالحة.</td></tr>
+      <tr><td class="ltr">RULE_EXCEPTION</td><td>ScanEngine</td><td>استثناء غير متوقع داخل عامل، معزول عن بقية الدفعة.</td></tr>
+    </tbody>
+  </table>
+  <div class="warn box"><strong>قاعدة مهمة:</strong> <code>Not Verified</code> تعني «لم نستطع التحقق»، وليس «آمن». لذلك لا تُحوَّل إلى <code>LOW</code> في أي مكان في النظام، وتُعرض في الواجهة بلون رمادي محايد وبنص صريح.</div>
+</section>
+
+<section id="s10">
+  <h2>١٠. البناء والتشغيل</h2>
+  <table>
+    <thead><tr><th>الخطوة</th><th>الأمر</th></tr></thead>
+    <tbody>
+      <tr><td>تشغيل الاختبارات</td><td class="ltr">mvn test</td></tr>
+      <tr><td>بناء الحزمة بدون اختبارات</td><td class="ltr">mvn package -DskipTests</td></tr>
+      <tr><td>تشغيل التطبيق</td><td class="ltr">java -jar target\threat-detector-java-0.1.0.jar</td></tr>
+      <tr><td>الدخول للفحص الدفعي</td><td>Bulk scan ← Choose file ← samples\inputs.csv ← Run batch</td></tr>
+    </tbody>
+  </table>
+  <p>يُنتج <code>maven-shade-plugin</code> ملف jar شاملًا. عند التشغيل قد يظهر تحذير <span class="ltr">Unsupported JavaFX configuration: classes were loaded from 'unnamed module'</span>؛ هو تحذير غير مؤثر لأن الـ jar يعمل على classpath وليس module path.</p>
+</section>
+
+<section id="s11">
+  <h2>١١. الاختبارات ونتائج التحقق</h2>
+  <p>أُجري <code>mvn clean test</code> بنتيجة:</p>
+  <div class="flow">Tests run: 52, Failures: 0, Errors: 0, Skipped: 0</div>
+  <table>
+    <thead><tr><th>ملف الاختبار</th><th>العدد</th><th>أهم ما يغطيه</th></tr></thead>
+    <tbody>
+      <tr><td><code>RuleSetTest</code></td><td>24</td><td>كل قواعد الروابط والرسائل، الحدود، أمثلة الدرجة 55 و60 و85.</td></tr>
+      <tr><td><code>CsvLoaderTest</code></td><td>8</td><td>المفقود، الرأس الخاطئ، الصفوف غير الصالحة، الاقتباسات، CSV فارغ.</td></tr>
+      <tr><td><code>ScanEngineTest</code></td><td>8</td><td>الترتيب، العمال، عزل الأخطاء، تدفق الأحداث، التزامن الفعلي.</td></tr>
+      <tr><td><code>ScoringTest</code></td><td>5</td><td>العتبات والقصّ والاقتطاع.</td></tr>
+      <tr><td><code>ServiceTest</code></td><td>7</td><td>Option A/B، AI، واستمرار <code>INVALID_CSV_ROW</code>.</td></tr>
+    </tbody>
+  </table>
+  <h3>اختبارات يدوية إضافية</h3>
+  <ul>
+    <li>فحص <code>Phishing URL</code> أعطى <span class="ltr">High risk</span>.</li>
+    <li><code>Bulk scan</code> جاهز ويعرض العيّنة والمعاينة.</li>
+    <li><code>How it works</code> يعرض القواعد السبع عشرة.</li>
+    <li>الضغط على بطاقات العيّنات يُدخل الرابط في الحقل، مع خلفية داكنة واضحة للبطاقات.</li>
+    <li>الكاميرا العلوية للمشهد 3D مستقيمة بلا ميلان.</li>
+  </ul>
+</section>
+
+<section id="s12">
+  <h2>١٢. القيود والعمل المستقبلي</h2>
+  <table>
+    <thead><tr><th>العنصر</th><th>الحالة الحالية</th><th>ما المطلوب لتطويره</th></tr></thead>
+    <tbody>
+      <tr><td>التحقق الخارجي عبر API</td><td>مُحاكى فقط في Option B.</td><td>كتابة طلب HTTP داخل وضع <code>AVAILABLE</code>، مفتاح API، وعرض النتيجة.</td></tr>
+      <tr><td>شرح AI</td><td>بنية قابلة للتوصيل تُعيد <code>Optional.empty()</code>.</td><td>ربط نموذج أو خدمة، مع الحفاظ على كونه ثانوياً لا يغيّر النقاط.</td></tr>
+      <tr><td>النطاقات الدولية IDN</td><td>النموذج Punycode مدعوم؛ unicode غير محوّل قد يُرفض.</td><td>استخدام <code>IDN.toASCII</code> قبل التحليل.</td></tr>
+      <tr><td>بروتوكولات أخرى</td><td>ftp/mailto/javascript تُرفض.</td><td>توسيع <code>RuleSet</code> إن كان مطلوباً.</td></tr>
+      <tr><td>الروابط النسبية</td><td><code>//host</code> غير مدعوم.</td><td>إضافة تطبيع إضافي للمدخل.</td></tr>
+      <tr><td>عرض 3D</td><td>علوي مباشر حالياً.</td><td>يمكن ضبط زاوية متوسطة عبر <code>eye = (0, 19, 6)</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s13">
+  <h2>١٣. الخاتمة وتقييم الجاهزية</h2>
+  <p>التطبيق في حالته الحالية يغطي متطلبات Sprint 01 الأساسية بالكامل: واجهة JavaFX أصلية، قواعد محلية حقيقية، إدخال مفرد ودفعي، تعدد خيوط فعلي، عرض نتائج ودليل، معالجة أخطاء صريحة، وهوية بصرية مستقرة. عدد الاختبارات الآلية 52 اختباراً كلها ناجحة، وفُحصت الواجهة يدوياً في أوضاعها الثلاثة.</p>
+  <div class="box ok">
+    <strong>التقييم النهائي:</strong> الأساس مكتمل وجاهز للاستخدام (10/10). الميزة الإضافية للذكاء الاصطناعي جزئية فقط لأنها لم تُوصل بنموذج فعلي، وهذا موثّق بصراحة في <code>SPRINT1_MAPPING.md</code>. لا توجد عوائق تقنية لتشغيل النسخة الحالية أو إضافتها كمرجع مقارنة مع النسخة الأصلية.
+  </div>
+  <p class="small">ملاحظة: جميع أسماء القواعد وأكواد الأخطاء مكتوبة كما تظهر فعلياً في شيفرة المشروع، وتم الحفاظ على الصياغة الإنجليزية للعناصر التقنية لتسهيل التتبع بين التقرير والكود.</p>
+  <div class="footer-note">نهاية التقرير — threat-detector-java — النسخة 0.1.0 — 19 نوفمبر 2026</div>
+</section>
+
+</body>
+</html>

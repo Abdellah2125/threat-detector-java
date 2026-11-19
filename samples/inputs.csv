@@ -1,0 +1,11 @@
+type,target
+url,https://example.com
+url,http://192.168.1.10/login
+url,https://bit.ly/abc
+url,http://xn--bcher-kva.tk/login
+message,"Your verification code is 123456"
+message,"Urgent: your account will be suspended. Verify your password now at http://bit.ly/x"
+message,"Hey, are we still meeting at 5?"
+wing,https://example.com
+url,
+url,http://[bad
