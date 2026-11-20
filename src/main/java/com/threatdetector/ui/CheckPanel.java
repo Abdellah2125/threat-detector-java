@@ -23,6 +23,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /** Workspace 01: one URL or message, checked by the local rule engine. */
 public final class CheckPanel {
@@ -43,7 +44,8 @@ public final class CheckPanel {
 
     private final ScanCoordinator coordinator;
     private final ScanUiBridge bridge;
-    private final Panel panel = new Panel("01 / SIGNAL INPUT", "Check one signal", "01", "/ input");
+    private final Consumer<Mode> onModeChange;
+    private final Panel panel = new Panel("SCAN", "Start a Scan", "01", "Single input");
 
     private final ToggleGroup kindGroup = new ToggleGroup();
     private final ToggleButton urlToggle = new ToggleButton("URL");
@@ -52,17 +54,31 @@ public final class CheckPanel {
     private final TextArea messageField = new TextArea();
     private final StackPane fields = new StackPane();
     private final Label fieldLabel = Ui.label("URL to inspect", "field-label");
-    private final Label fieldHint = Ui.label("Scheme is optional", "field-hint");
+    private final Label fieldHint = Ui.label("Tip: full URLs work best (e.g. https://example.com)", "field-hint");
     private final Label counter = Ui.label("0 / 2,048", "field-count");
     private final HBox examples = new HBox(8);
     private final VBox scope = new VBox(8);
     private final Label error = Ui.label("", "banner banner-error");
     private final ScanProgress progress = new ScanProgress();
-    private final Button run = Ui.button("Run check", "button-primary");
+    private final Button run = Ui.button("Analyze", "button-primary");
 
-    public CheckPanel(ScanCoordinator coordinator, ScanUiBridge bridge) {
+    public CheckPanel(ScanCoordinator coordinator, ScanUiBridge bridge, Consumer<Mode> onModeChange) {
         this.coordinator = coordinator;
         this.bridge = bridge;
+        this.onModeChange = onModeChange;
+
+        ToggleGroup modeGroup = new ToggleGroup();
+        ToggleButton singleToggle = new ToggleButton("Single Input");
+        ToggleButton batchToggle = new ToggleButton("CSV Batch");
+        singleToggle.setToggleGroup(modeGroup);
+        batchToggle.setToggleGroup(modeGroup);
+        singleToggle.setSelected(true);
+        singleToggle.getStyleClass().add("seg__opt");
+        batchToggle.getStyleClass().add("seg__opt");
+        singleToggle.setOnAction(event -> onModeChange.accept(Mode.INSPECT));
+        batchToggle.setOnAction(event -> onModeChange.accept(Mode.BATCH));
+        HBox modeSwitch = new HBox(2, singleToggle, batchToggle);
+        modeSwitch.getStyleClass().add("seg");
 
         urlToggle.setToggleGroup(kindGroup);
         messageToggle.setToggleGroup(kindGroup);
@@ -92,9 +108,10 @@ public final class CheckPanel {
         examplesRow.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(examples, Priority.SOMETIMES);
 
+        Button clear = Ui.button("Clear", "button-secondary");
         HBox foot = new HBox(12,
-                Ui.label("Press Enter to run · Low risk is not a safety guarantee.", "panel-hint"),
-                Ui.spacer(), run);
+                Ui.label("Demo mode · fictional heuristic checks, no live analysis.", "panel-hint"),
+                Ui.spacer(), run, clear);
         foot.setAlignment(Pos.CENTER_LEFT);
 
         error.setVisible(false);
@@ -102,6 +119,7 @@ public final class CheckPanel {
         error.setWrapText(true);
 
         panel.body().getChildren().addAll(
+                modeSwitch,
                 segmented,
                 new VBox(4, fieldLabel, fieldHint, fields, fieldFoot),
                 examplesRow,
@@ -122,6 +140,7 @@ public final class CheckPanel {
             }
         });
         run.setOnAction(event -> startScan());
+        clear.setOnAction(event -> reset());
 
         updateKind();
     }
@@ -136,8 +155,10 @@ public final class CheckPanel {
         urlField.setManaged(url);
         messageField.setVisible(!url);
         messageField.setManaged(!url);
-        fieldLabel.setText(url ? "URL to inspect" : "Message to inspect");
-        fieldHint.setText(url ? "Scheme is optional" : "Paste the complete text");
+        fieldLabel.setText(url ? "URL or message" : "Message to inspect");
+        fieldHint.setText(url
+                ? "Tip: full URLs work best (e.g. https://example.com)"
+                : "Tip: paste the message exactly as received");
         updateCounter();
         rebuildExamples(url);
         rebuildScope(url);

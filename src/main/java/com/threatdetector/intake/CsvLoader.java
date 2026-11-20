@@ -1,17 +1,16 @@
 package com.threatdetector.intake;
 
-import com.threatdetector.model.CsvLoadReport;
-import com.threatdetector.model.LoadedRow;
-import com.threatdetector.model.ScanOutcome;
-import com.threatdetector.model.TargetKind;
-
 import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+
+import com.threatdetector.model.CsvLoadReport;
+import com.threatdetector.model.LoadedRow;
+import com.threatdetector.model.ScanOutcome;
+import com.threatdetector.model.TargetKind;
 
 /** Bounded, validated CSV intake. Dedicated backend service, no UI logic. */
 public final class CsvLoader {

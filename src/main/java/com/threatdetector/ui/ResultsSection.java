@@ -33,6 +33,7 @@ public final class ResultsSection {
     private final Label workersMeta = Ui.badge("— WORKERS", "neutral");
     private final Label durationMeta = Ui.badge("— MS", "neutral");
     private final StackPane body = new StackPane();
+    private final VBox placeholder = new VBox(12);
     private final VerdictCard verdict = new VerdictCard();
     private final VBox batchHost = new VBox(14);
     private final HBox filters = new HBox(8);
@@ -44,6 +45,15 @@ public final class ResultsSection {
 
     public ResultsSection() {
         node.getStyleClass().add("results");
+
+        placeholder.getStyleClass().add("result-placeholder");
+        placeholder.setAlignment(Pos.CENTER);
+        placeholder.getChildren().addAll(
+                Ui.label("◎", "placeholder-icon"),
+                Ui.label("Results will appear here", "results-title"),
+                Ui.label("Analyze a URL or message, or drop a CSV file, to see local rule results.",
+                        "placeholder-copy"));
+
         VBox headingBox = new VBox(3, kicker, heading);
         HBox.setHgrow(headingBox, Priority.ALWAYS);
         HBox meta = new HBox(8, liveMeta, itemsMeta, workersMeta, durationMeta);
@@ -57,7 +67,7 @@ public final class ResultsSection {
         VBox summaryWrap = new VBox(10, summary, distribution);
         summaryWrap.getStyleClass().add("summary-wrap");
         batchHost.getChildren().addAll(filters, summaryWrap, table);
-        body.getChildren().addAll(verdict, batchHost);
+        body.getChildren().addAll(verdict, batchHost, placeholder);
         node.getChildren().addAll(head, body);
         buildTable();
         clear();
@@ -91,6 +101,8 @@ public final class ResultsSection {
         verdict.show(report, explanation);
         batchHost.setVisible(false);
         batchHost.setManaged(false);
+        placeholder.setVisible(false);
+        placeholder.setManaged(false);
         show();
     }
 
@@ -107,6 +119,8 @@ public final class ResultsSection {
         verdict.clear();
         batchHost.setVisible(true);
         batchHost.setManaged(true);
+        placeholder.setVisible(false);
+        placeholder.setManaged(false);
         show();
     }
 
@@ -217,8 +231,8 @@ public final class ResultsSection {
     }
 
     public void clear() {
-        kicker.setText("REPORT / SINGLE SIGNAL");
-        heading.setText("Verdict");
+        kicker.setText("REPORT");
+        heading.setText("Analysis Results");
         verdict.clear();
         batchHost.setVisible(false);
         batchHost.setManaged(false);
@@ -230,11 +244,13 @@ public final class ResultsSection {
         workersMeta.setText("— WORKERS");
         durationMeta.setText("— MS");
         liveMeta.setText("");
-        node.setVisible(false);
-        node.setManaged(false);
+        placeholder.setVisible(true);
+        placeholder.setManaged(true);
+        node.setVisible(true);
+        node.setManaged(true);
     }
 
-    public Node getNode() {
+    public Region getNode() {
         return node;
     }
 

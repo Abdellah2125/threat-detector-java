@@ -2,7 +2,6 @@ package com.threatdetector.runtime;
 
 import com.threatdetector.model.ItemResult;
 import com.threatdetector.model.ScanEvents;
-import com.threatdetector.model.Summary;
 
 /** Telemetry sink implemented by the UI. All callbacks may run on worker threads. */
 public interface ScanObserver {

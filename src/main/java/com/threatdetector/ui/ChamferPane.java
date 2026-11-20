@@ -6,18 +6,15 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-/**
- * Square panel with the two L-shaped accent brackets used by the original
- * design: amber at the top-left, coral at the bottom-right.
- */
+/** Quiet panel with a single subtle green corner accent. */
 public class ChamferPane extends Pane {
     private static final double INSET = 7;
-    private static final double LENGTH = 16;
+    private static final double LENGTH = 14;
 
-    private final Line topHorizontal = line(Color.web("#e8a33d"));
-    private final Line topVertical = line(Color.web("#e8a33d"));
-    private final Line bottomHorizontal = line(Color.web("#d9705f"));
-    private final Line bottomVertical = line(Color.web("#d9705f"));
+    private final Line topHorizontal = line(Color.web("#1E7D3C", 0.22));
+    private final Line topVertical = line(Color.web("#1E7D3C", 0.22));
+    private final Line bottomHorizontal = line(Color.TRANSPARENT);
+    private final Line bottomVertical = line(Color.TRANSPARENT);
 
     public ChamferPane(double unusedCut) {
         getChildren().addAll(topHorizontal, topVertical, bottomHorizontal, bottomVertical);
@@ -56,17 +53,14 @@ public class ChamferPane extends Pane {
         topHorizontal.setStartY(top);
         topHorizontal.setEndX(left + LENGTH);
         topHorizontal.setEndY(top);
-
         topVertical.setStartX(left);
         topVertical.setStartY(top);
         topVertical.setEndX(left);
         topVertical.setEndY(top + LENGTH);
-
         bottomHorizontal.setStartX(right - LENGTH);
         bottomHorizontal.setStartY(bottom);
         bottomHorizontal.setEndX(right);
         bottomHorizontal.setEndY(bottom);
-
         bottomVertical.setStartX(right);
         bottomVertical.setStartY(bottom - LENGTH);
         bottomVertical.setEndX(right);

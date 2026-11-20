@@ -2,37 +2,33 @@ package com.threatdetector.ui;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 
-/** Monochrome geometric mark used in the rail. */
+/** Small green shield mark used in the top bar and hero. */
 public final class BrandMark extends Pane {
     public BrandMark() {
-        setMinSize(46, 46);
-        setPrefSize(46, 46);
-        setMaxSize(46, 46);
+        setMinSize(26, 26);
+        setPrefSize(26, 26);
+        setMaxSize(26, 26);
 
-        Polygon outer = polygon(
-                23, 1, 43, 12, 43, 34, 23, 45, 3, 34, 3, 12);
-        outer.setFill(Color.TRANSPARENT);
-        outer.setStroke(Color.web("#e8a33d"));
-        outer.setStrokeWidth(1.6);
+        Polygon shield = new Polygon(
+                13, 0.5, 25, 4.6, 25, 13.0,
+                13, 25.5, 1, 13.0, 1, 4.6);
+        shield.setFill(Color.web("#1E7D3C"));
 
-        Polygon inner = polygon(
-                23, 9, 36, 16, 36, 30, 23, 37, 10, 30, 10, 16);
-        inner.setFill(Color.rgb(232, 163, 61, 0.07));
-        inner.setStroke(Color.web("#e8a33d", 0.45));
-        inner.setStrokeWidth(1);
+        Rectangle body = new Rectangle(9.2, 12.2, 7.6, 6.2);
+        body.setArcWidth(2);
+        body.setArcHeight(2);
+        body.setFill(Color.web("#10161C"));
 
-        Circle core = new Circle(23, 23, 4.2, Color.web("#ff8a7a"));
-        Circle halo = new Circle(23, 23, 8.0, Color.rgb(255, 138, 122, 0.12));
-        getChildren().addAll(outer, inner, halo, core);
+        javafx.scene.shape.Arc shackle = new javafx.scene.shape.Arc(
+                13, 12.4, 5.6, 6.2, 180, 180);
+        shackle.setFill(Color.TRANSPARENT);
+        shackle.setStroke(Color.web("#10161C"));
+        shackle.setStrokeWidth(1.5);
+
+        getChildren().addAll(shield, body, shackle);
         setPickOnBounds(false);
-    }
-
-    private static Polygon polygon(double... points) {
-        Polygon polygon = new Polygon();
-        for (double point : points) polygon.getPoints().add(point);
-        return polygon;
     }
 }

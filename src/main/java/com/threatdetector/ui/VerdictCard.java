@@ -167,10 +167,10 @@ public final class VerdictCard extends ChamferPane {
 
     private static Color toneColor(String tone) {
         return switch (tone) {
-            case "high" -> Color.web("#ff7a6b");
-            case "medium" -> Color.web("#f2b555");
-            case "low" -> Color.web("#a9c0a0");
-            default -> Color.web("#a6a49d");
+            case "high" -> Color.web("#C2263B");
+            case "medium" -> Color.web("#B45309");
+            case "low" -> Color.web("#127A48");
+            default -> Color.web("#55606A");
         };
     }
 }

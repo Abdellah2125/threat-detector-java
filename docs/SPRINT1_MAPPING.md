@@ -2,12 +2,12 @@
 
 | # | Requirement (course brief) | Implementation | Status |
 |---|---|---|---|
-| 1 | GUI framework (e.g. Swing, JavaFX) | `ui/ThreatDetectorApp.java` — JavaFX 17 desktop shell with rail, topbar, hero and three workspace modes | ✅ |
+| 1 | GUI framework (e.g. Swing, JavaFX) | `ui/ThreatDetectorApp.java` — JavaFX 17 dashboard shell with top navigation, hero, workspace and four workspace modes | ✅ |
 | 2 | Load single URLs/messages and browse local CSV files | `ui/CheckPanel.java`, `ui/BulkPanel.java` (FileChooser), `intake/CsvLoader.java` | ✅ |
 | 3 | Modular backend: threat rules and file parsing in dedicated service classes | `detection/`, `intake/`, `runtime/` packages; `ThreatEvaluationService` port | ✅ |
 | 4 | Display selected inputs and evaluation results, risk levels and status indicators | `TableView` in `BulkPanel` and `ResultsSection`, `VerdictCard`, `badge-high/medium/low/unverified` CSS classes | ✅ |
 | 5 | Progress indicators for each evaluation | `runtime/ScanObserver` telemetry → `ui/ScanProgress` plus `ui/ThreadCoreView` 3D packet animation | ✅ |
-| 6 | Responsive, user-friendly interface | JavaFX layout panes with min window size 1024×640, wrapping labels, resizable tables, rail navigation, four-part orientation strip; visual identity ported from the original design and harmonised to one dark palette | ✅ |
+| 6 | Responsive, user-friendly interface | JavaFX layout panes with min window size 1024×640, wrapping labels, resizable tables, top navigation, summary/history cards and a light dashboard palette (`#F4F7F5`, white cards, `#1E7D3C` accent) | ✅ |
 | 7 | Input/error handling: empty input, malformed URL, invalid CSV rows, missing files, unavailable API responses — no crash | `EMPTY_INPUT`, `INVALID_URL`, `INPUT_TOO_LONG`, `INVALID_CSV_ROW`, `LoadException` banner, `CheckUnavailableException` → `NotVerified` | ✅ |
 | 8 | Unreachable checks reported as **Not Verified**, never safe | `ScanOutcome.NotVerified` sealed variant; `RULE_EXCEPTION` isolation; UI label “Unverified items are never safe” | ✅ |
 | 9 | Option A — local rule-based detection (HTTP vs HTTPS, IP hosts, misleading subdomains, urgency, credentials), cumulative score → Low/Medium/High | 10 URL rules + 7 message rules, `Scoring.finalize` (60/25 thresholds, 100 cap) | ✅ |

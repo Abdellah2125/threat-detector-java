@@ -1,8 +1,9 @@
 package com.threatdetector.ui;
 
-/** The three workspace modes of the original shell. */
+/** The workspace modes of the dashboard shell. */
 public enum Mode {
     INSPECT,
     BATCH,
-    METHOD
+    METHOD,
+    CORE
 }

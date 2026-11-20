@@ -152,7 +152,7 @@ public final class MethodPanel {
         return table;
     }
 
-    public Node getNode() {
+    public Region getNode() {
         return panel;
     }
 }

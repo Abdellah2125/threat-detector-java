@@ -17,6 +17,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -24,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 /** Workspace 02: load a CSV, preview validated rows, scan them concurrently. */
 public final class BulkPanel {
@@ -31,19 +34,34 @@ public final class BulkPanel {
 
     private final ScanCoordinator coordinator;
     private final ScanUiBridge bridge;
-    private final Panel panel = new Panel("02 / BATCH INTAKE", "Analyze a CSV batch", "02", "Batch");
+    private final Consumer<Mode> onModeChange;
+    private final Panel panel = new Panel("SCAN", "CSV Batch", "02", "Batch input");
     private final VBox fileArea = new VBox(12);
     private final VBox warnings = new VBox(6);
     private final Label previewCount = Ui.mono("NO FILE");
     private final TableView<LoadedRow> preview = new TableView<>();
     private final ScanProgress progress = new ScanProgress();
     private final Label error = Ui.label("", "banner banner-error");
-    private final Button run = Ui.button("Run batch", "button-primary");
+    private final Button run = Ui.button("Analyze", "button-primary");
     private CsvLoadReport loaded;
 
-    public BulkPanel(ScanCoordinator coordinator, ScanUiBridge bridge) {
+    public BulkPanel(ScanCoordinator coordinator, ScanUiBridge bridge, Consumer<Mode> onModeChange) {
         this.coordinator = coordinator;
         this.bridge = bridge;
+        this.onModeChange = onModeChange;
+
+        ToggleGroup modeGroup = new ToggleGroup();
+        ToggleButton singleToggle = new ToggleButton("Single Input");
+        ToggleButton batchToggle = new ToggleButton("CSV Batch");
+        singleToggle.setToggleGroup(modeGroup);
+        batchToggle.setToggleGroup(modeGroup);
+        batchToggle.setSelected(true);
+        singleToggle.getStyleClass().add("seg__opt");
+        batchToggle.getStyleClass().add("seg__opt");
+        singleToggle.setOnAction(event -> onModeChange.accept(Mode.INSPECT));
+        batchToggle.setOnAction(event -> onModeChange.accept(Mode.BATCH));
+        HBox modeSwitch = new HBox(2, singleToggle, batchToggle);
+        modeSwitch.getStyleClass().add("seg");
 
         buildPreview();
         error.setWrapText(true);
@@ -55,13 +73,14 @@ public final class BulkPanel {
         HBox previewHead = new HBox(10, previewTitle, Ui.spacer(), previewCount);
         previewHead.setAlignment(Pos.CENTER_LEFT);
 
+        Button clear = Ui.button("Clear", "button-secondary");
         HBox foot = new HBox(12,
-                Ui.label("Rows that fail validation stay Not verified — never reported as safe.",
-                        "panel-hint"),
-                Ui.spacer(), run);
+                Ui.label("Invalid rows stay Not verified — never reported as safe.", "panel-hint"),
+                Ui.spacer(), run, clear);
         foot.setAlignment(Pos.CENTER_LEFT);
 
         panel.body().getChildren().addAll(
+                modeSwitch,
                 fileArea,
                 warnings,
                 new VBox(8, previewHead, preview),
@@ -71,6 +90,7 @@ public final class BulkPanel {
 
         rebuildFileArea();
         run.setOnAction(event -> startScan());
+        clear.setOnAction(event -> reset());
     }
 
     private void rebuildFileArea() {
@@ -80,8 +100,8 @@ public final class BulkPanel {
             drop.getStyleClass().add("file-drop");
             Label icon = Ui.label("▤", "file-drop-icon");
             VBox copy = new VBox(4,
-                    Ui.label("Load a CSV batch", "file-drop-title"),
-                    Ui.label("Columns: type (url or message) and target. Up to 5,000 rows · 5 MB.",
+                    Ui.label("Drag & drop a CSV file here", "file-drop-title"),
+                    Ui.label("or click to browse · columns: type (url or message) and target · up to 5,000 rows / 5 MB",
                             "file-drop-hint"));
             HBox.setHgrow(copy, Priority.ALWAYS);
             Button choose = Ui.button("Choose file", "button-secondary");

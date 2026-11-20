@@ -73,13 +73,21 @@ java -jar target\threat-detector-java-0.1.0.jar
 
 ## استخدام الواجهة
 
+الواجهة الآن على شكل dashboard فاتح مستوحى من النموذج المرجعي: شريط تنقّل علوي، بطاقة تعريف، ثم عمود فحص رئيسي وعمود جانبي للملخّص والسجل.
+
 | المساحة | ما تفعله |
 |---|---|
-| **01 Check** | أدخل رابطاً أو رسالة، أو اضغط إحدى البطاقات الثلاث `Phishing URL` / `Nested domain` / `Clean URL` لتعبئة الحقل تلقائياً، ثم `Run check`. |
-| **02 Bulk scan** | اختر `Choose file` وافتح `samples\inputs.csv`، ثم `Run batch`. |
-| **03 How it works** | يعرض سلم الدرجات، قواعد الروابط والرسائل، وعقد التزامن والحدود. |
+| **Dashboard** | يفتح فحص مفرد. اختر `URL` أو `Message`، أو اضغط إحدى البطاقات الثلاث `Phishing URL` / `Nested domain` / `Clean URL` لتعبئة الحقل، ثم `Analyze`. |
+| **History** | يفتح فحص CSV. اختر `Choose file` وافتح `samples\inputs.csv`، ثم `Analyze`. |
+| **Settings** | يعرض سلم الدرجات، قواعد الروابط والرسائل، وعقد التزامن والحدود. |
+| **Hardware** | يعرض مشهد `ThreadCore` ثلاثي الأبعاد وحالة العمال أثناء الفحص. |
+| **Risk Levels** | اختصار لصفحة `Settings`. |
+| **Threat Summary** | ملخّص حي لعدد الفحوص ونتائج الخطورة العالية والمتوسطة. |
+| **Analysis Results** | آخر خمس نتائج مع مستوى الخطورة والحالة والتفاصيل والوقت. |
 
-شريط إرشادي داخل الواجهة يشرح المناطق: `A NAVIGATION`، `B INPUT`، `C LIVE FLOOR`، `D REPORT`.
+مفتاحا `Single Input` و`CSV Batch` أعلى بطاقة الفحص يبدّلان بين الوضعين مباشرة.
+
+الهوية البصرية الجديدة: خلفية `#F4F7F5`، بطاقات بيضاء بحواف `#1E7D3C` وظلال خفيفة، نص `#10161C`، وألوان مخاطر `#C2263B` / `#B45309` / `#127A48`. اللقطة الحالية في `preview.png`.
 
 ### ملف CSV المقبول
 
@@ -130,7 +138,11 @@ src/main/java/com/threatdetector/
 ├── detection/                     17 قاعدة + RuleSet + Scoring + RuleCatalog
 ├── intake/                        قارئ CSV محدود ومُتحقَّق منه
 ├── runtime/                       ScanCoordinator + ScanEngine + الخدمات
-└── ui/                            قشرة JavaFX، اللوحات، التقرير، مشهد ThreadCore ثلاثي الأبعاد
+├── ui/                            قشرة JavaFX، اللوحات، التقرير، مشهد ThreadCore ثلاثي الأبعاد
+│   ├── TopNav.java                شريط التنقل العلوي وحالة الفحص
+│   ├── SummaryCard.java           بطاقة Threat Summary
+│   ├── RecentHistoryCard.java     جدول Analysis Results
+│   └── Mode.java                  الأوضاع: Dashboard / Batch / Method / Core
 
 src/main/resources/
 ├── app.css                        الهوية البصرية ولوحة الألوان
