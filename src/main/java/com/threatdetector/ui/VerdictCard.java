@@ -23,6 +23,7 @@ public final class VerdictCard extends ChamferPane {
     private final HBox facts = new HBox(28);
     private final Label scoreFactValue = Ui.label("—", "fact-value");
     private final VBox findings = new VBox(10);
+    private boolean lightTheme;
 
     public VerdictCard() {
         super(16);
@@ -107,6 +108,11 @@ public final class VerdictCard extends ChamferPane {
         setManaged(false);
     }
 
+    public void setLightTheme(boolean light) {
+        this.lightTheme = light;
+        dial.setLightTheme(light);
+    }
+
     private static VBox fact(String label, String value) {
         return fact(label, Ui.label(value, "fact-value"));
     }
@@ -165,12 +171,20 @@ public final class VerdictCard extends ChamferPane {
         };
     }
 
-    private static Color toneColor(String tone) {
+    private Color toneColor(String tone) {
+        if (lightTheme) {
+            return switch (tone) {
+                case "high" -> Color.web("#C2263B");
+                case "medium" -> Color.web("#B45309");
+                case "low" -> Color.web("#127A48");
+                default -> Color.web("#55606A");
+            };
+        }
         return switch (tone) {
-            case "high" -> Color.web("#C2263B");
-            case "medium" -> Color.web("#B45309");
-            case "low" -> Color.web("#127A48");
-            default -> Color.web("#55606A");
+            case "high" -> Color.web("#FF5A5F");
+            case "medium" -> Color.web("#FFB020");
+            case "low" -> Color.web("#3DDC84");
+            default -> Color.web("#8A93A0");
         };
     }
 }

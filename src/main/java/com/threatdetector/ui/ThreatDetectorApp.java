@@ -26,16 +26,18 @@ import javafx.stage.Stage;
 public final class ThreatDetectorApp extends Application {
     private ScanCoordinator coordinator;
     private TopNav nav;
+    private BorderPane root;
     private HBox dashboard;
     private VBox mainColumn;
     private VBox sideColumn;
     private CheckPanel checkPanel;
     private BulkPanel bulkPanel;
     private MethodPanel methodPanel;
-    private ThreadCorePanel corePanel;
+    private HistoryPanel historyPanel;
     private ResultsSection results;
     private SummaryCard summaryCard;
     private RecentHistoryCard historyCard;
+    private boolean lightTheme;
 
     @Override
     public void init() {
@@ -49,11 +51,11 @@ public final class ThreatDetectorApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        nav = new TopNav(this::switchMode);
+        nav = new TopNav(this::switchMode, this::toggleTheme);
         results = new ResultsSection();
         summaryCard = new SummaryCard();
         historyCard = new RecentHistoryCard();
-        corePanel = new ThreadCorePanel();
+        historyPanel = new HistoryPanel();
         checkPanel = new CheckPanel(coordinator, bridge(), this::switchMode);
         bulkPanel = new BulkPanel(coordinator, bridge(), this::switchMode);
         methodPanel = new MethodPanel();
@@ -90,7 +92,7 @@ public final class ThreatDetectorApp extends Application {
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        BorderPane root = new BorderPane();
+        root = new BorderPane();
         root.getStyleClass().add("app-shell");
         root.setTop(nav);
         root.setCenter(scroll);
@@ -100,7 +102,8 @@ public final class ThreatDetectorApp extends Application {
         double height = Math.max(680, Math.min(960, bounds.getHeight() - 32));
         Scene scene = new Scene(root, width, height);
         scene.getStylesheets().add(getClass().getResource("/app.css").toExternalForm());
-        stage.setTitle("Threat Detector — Dashboard");
+        applyTheme();
+        stage.setTitle("Threat Detector");
         stage.setMinWidth(1024);
         stage.setMinHeight(640);
         stage.setX(bounds.getMinX() + (bounds.getWidth() - width) / 2);
@@ -117,28 +120,20 @@ public final class ThreatDetectorApp extends Application {
             @Override
             public void onStarted(int total, int workers) {
                 nav.setStatus("Checking", "0 of " + total + " items", true);
-                corePanel.core().setWorkers(workers);
-                corePanel.core().setCounts(0, total);
-                corePanel.core().setPhase("running");
-                corePanel.core().setProgress(0);
             }
 
             @Override
             public void onItem(ItemResult result, int completed, int total) {
                 nav.setStatus("Checking", completed + " of " + total + " items", true);
-                corePanel.core().dispatch(result.workerId(), result.outcome());
-                corePanel.core().setCounts(completed, total);
-                corePanel.core().setProgress(total == 0 ? 1 : completed / (double) total);
             }
 
             @Override
             public void onFinished(ScanReport report, boolean single, String explanation) {
                 nav.setStatus("Check complete",
                         report.summary().total() + " items · " + report.durationMs() + " ms", false);
-                corePanel.core().setPhase("complete");
-                corePanel.core().setProgress(1);
                 summaryCard.show(report);
                 historyCard.add(report);
+                historyPanel.add(report);
                 if (single)
                     results.showSingle(report, explanation);
                 else
@@ -148,13 +143,11 @@ public final class ThreatDetectorApp extends Application {
             @Override
             public void onFailed(String message) {
                 nav.setStatus(message, "No report was produced", false);
-                corePanel.core().setPhase("failed");
             }
 
             @Override
             public void onReset() {
                 results.clear();
-                corePanel.core().reset();
             }
         };
     }
@@ -164,10 +157,11 @@ public final class ThreatDetectorApp extends Application {
         dashboard.getChildren().clear();
 
         switch (mode) {
+            // INSPECT and BATCH are Dashboard scan sub-modes (single input vs CSV batch)
             case INSPECT -> showWorkspace(checkPanel.getNode());
             case BATCH -> showWorkspace(bulkPanel.getNode());
+            case HISTORY -> showFullWidth(historyPanel.getNode());
             case METHOD -> showFullWidth(methodPanel.getNode());
-            case CORE -> showFullWidth(corePanel.getNode());
         }
     }
 
@@ -191,12 +185,26 @@ public final class ThreatDetectorApp extends Application {
     private void resetAll() {
         checkPanel.reset();
         bulkPanel.reset();
-        corePanel.core().reset();
         results.clear();
         summaryCard.clear();
         historyCard.clear();
+        historyPanel.clear();
         nav.setStatus("Idle", "No active check", false);
         switchMode(Mode.INSPECT);
+    }
+
+    private void toggleTheme() {
+        lightTheme = !lightTheme;
+        applyTheme();
+    }
+
+    private void applyTheme() {
+        if (root == null) return;
+        root.getStyleClass().remove("light-theme");
+        if (lightTheme) root.getStyleClass().add("light-theme");
+        nav.setTheme(lightTheme);
+        summaryCard.setLightTheme(lightTheme);
+        results.setLightTheme(lightTheme);
     }
 
     private static void loadFont(String resource) {

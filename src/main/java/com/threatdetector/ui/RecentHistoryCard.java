@@ -48,7 +48,7 @@ public final class RecentHistoryCard extends VBox {
                 styledColumn("RISK LEVEL", row -> riskText(row.result()), row -> riskClass(row.result())),
                 styledColumn("STATUS", row -> statusText(row.result()), row -> statusClass(row.result())),
                 column("DETAILS", row -> details(row.result())),
-                column("TIME", row -> row.time() + " Today"));
+                column("TIME", row -> row.time()));
 
         getChildren().addAll(heading, table);
     }

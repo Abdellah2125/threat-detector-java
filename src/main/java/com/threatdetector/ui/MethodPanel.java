@@ -17,12 +17,13 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-/** Workspace 03: verdict scale, concurrency contract, rules and limits. */
+/** Settings/Method view: verdict scale, concurrency contract, rules and limits (project logic). */
 public final class MethodPanel {
     private record Card(ChamferPane pane, VBox body) {
     }
 
-    private final Panel panel = new Panel("03 / METHOD", "Rules, limits, and guarantees", "03", "Method");
+    // Panel header aligned with "Settings" nav while content remains factual to project logic.
+    private final Panel panel = new Panel("SETTINGS", "Method & Rules", "—", "Detection · limits · guarantees");
 
     public MethodPanel() {
         GridPane top = grid();

@@ -6,13 +6,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-/** Quiet panel with a single subtle green corner accent. */
+/** Quiet panel with a subtle accent corner mark, recolored for the dark reference theme. */
 public class ChamferPane extends Pane {
     private static final double INSET = 7;
     private static final double LENGTH = 14;
 
-    private final Line topHorizontal = line(Color.web("#1E7D3C", 0.22));
-    private final Line topVertical = line(Color.web("#1E7D3C", 0.22));
+    // Accent corner uses reference dark accent (#8DEB6B) at low opacity for a subtle glow hint
+    private final Line topHorizontal = line(Color.web("#8DEB6B", 0.28));
+    private final Line topVertical = line(Color.web("#8DEB6B", 0.28));
     private final Line bottomHorizontal = line(Color.TRANSPARENT);
     private final Line bottomVertical = line(Color.TRANSPARENT);
 

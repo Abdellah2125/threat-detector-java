@@ -254,6 +254,10 @@ public final class ResultsSection {
         return node;
     }
 
+    public void setLightTheme(boolean light) {
+        verdict.setLightTheme(light);
+    }
+
     private static String verdictText(ItemResult result) {
         if (result.outcome() instanceof ScanOutcome.Scored scored) {
             return band(scored.risk());
